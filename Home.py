@@ -12,7 +12,7 @@ def set_page_config():
     st.set_page_config(
             page_title='Home',
             page_icon='📖',
-            layout='wide"',
+            layout='wide',
             menu_items={'Get Help': None, 'Report a bug': None,'About': None},
         )
 
@@ -72,11 +72,8 @@ def fetch_data(name, cuisine, category, occasion):
 
 
 def move_page(recipe_id):
+    
     st.session_state.selected_recipe = recipe_id
-
-
-
-
 
 def create_filtering_input():
     """Create filtering input fields."""
@@ -110,26 +107,31 @@ if st.session_state.selected_recipe is None:
         name,cuisine, category, occasion = create_filtering_input()
         submitted = st.form_submit_button('Find Recipes')
 
-        if submitted:
-            with st.spinner('🧐 Searching for recipes...'):
+    if submitted:
+        with st.spinner('🧐 Searching for recipes...'):
 
 
-                recipes = fetch_data(name, cuisine, category, occasion)
+            recipes = fetch_data(name, cuisine, category, occasion)
 
-                if recipes:
-                    for recipe in recipes:
-                        with st.expander(icon = '🍽️', label = f"**{recipe.get('name')}**"):
-                            st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
-                            st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
-                            st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
-                            
-                            if st.form_submit_button(label = 'Go to recipe', 
-                                                     type = 'primary', 
-                                                     on_click = move_page, 
-                                                     args=(str(recipe['_id']),)):
-                                pass
-                else:
-                    st.write('No recipe found. Try other filters.')
+            if recipes:
+                for recipe in recipes:
+                    with st.expander(icon = '🍽️', label = f"**{recipe.get('name')}**"):
+                        st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
+                        st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
+                        st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
+                        
+                        # if st.button(label = 'Go to recipe', 
+                        #              type = 'primary', 
+                        #              key=f"go_to_recipe_{recipe['_id']}"):
+                        #             move_page(str(recipe['_id']))
+                        if st.button(label = 'Go to recipe', 
+                                    type = 'primary', 
+                                    on_click = move_page, 
+                                    args=(str(recipe['_id']),)):
+                                    pass
+
+            else:
+                st.write('No recipes found. Try different filters.')
 else:
     collection = connect_to_db_collection(client)
     
@@ -138,20 +140,28 @@ else:
 
     if recipe:
         st.title(f'🍽️ {recipe['name']}')
+
+        # Display attributes
         with st.container(border = True):
             st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
             st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
             st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
 
-        st.subheader("Steps")
-        for i, step in enumerate(recipe.get('step', []), start=0):
+        # Display ingredients (Render HTML expressions)
+        st.subheader('Ingredients')
+        with st.container(border=True):
+            st.markdown(recipe.get('ingredients', 'N/A').replace("\n", "<br>"), unsafe_allow_html=True)
+
+        # Display steps (Render HTML expressions)
+        st.subheader('Steps')
+        for i, step in enumerate(recipe.get('step', []), start = 1):
             with st.container(border = True):
-                st.write(f'S**Step {i + 1} :** {step}')
+                st.markdown(f'**Step {i} :** {step}'.replace("\n", "<br>"), unsafe_allow_html=True)
 
         if st.button(label = 'Back to Search',
                      type = 'primary'):
             st.session_state.selected_recipe = None
-
+            
     else:
         st.error('Recipe not found!')
         if st.button(label = 'Back to Search',

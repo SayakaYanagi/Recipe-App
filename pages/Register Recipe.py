@@ -37,7 +37,7 @@ if 'steps' not in st.session_state:
 def add_step():
     st.session_state.steps.append('')
 
-def load_data_db(name, cuisine, category, occasion, steps):
+def load_data_db(name, cuisine, category, occasion, ingredients, steps):
 
     # Connect to MongoDB collection
     collection = connect_to_db_collection(client)
@@ -50,6 +50,7 @@ def load_data_db(name, cuisine, category, occasion, steps):
                  'category' : category,
                  'occasion' : occasion,
                  'last_update' : today,
+                 'ingredients' : ingredients,
                  'step' : steps
                  }
     
@@ -68,6 +69,10 @@ with st.container(border = True):
                     occasion = st.selectbox(label = 'Input occasion', 
                                 options = ['Quick & Easy','Spicy', 'Healthy','Party', 'Vegetarian'],
                                 index = None)
+                    
+
+with st.container(border = True):
+    ingredients = st.text_area(label = 'Ingredients', height = 100, placeholder = '・1 Onion \n・1Tbs Sugar')
 
 with st.container(border = True):
 
@@ -77,6 +82,6 @@ with st.container(border = True):
         st.session_state.steps[i] = st.text_input(label = f'Step {i+1}', value = st.session_state.steps[i], key = f'step_{i}')
 
     st.button(label = 'Add step', type = 'primary', on_click = add_step)
-    if st.button(label = 'Register recipe', type = 'primary', on_click = load_data_db, args = (name, cuisine, category, occasion, st.session_state.steps)):
+    if st.button(label = 'Register recipe', type = 'primary', on_click = load_data_db, args = (name, cuisine, category, occasion, ingredients, st.session_state.steps)):
         st.markdown('Recipe added!')
 
