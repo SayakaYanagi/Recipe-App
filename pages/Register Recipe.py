@@ -38,6 +38,7 @@ def add_step():
     st.session_state.steps.append('')
 
 def load_data_db(name, cuisine, category, occasion, ingredients, steps):
+    
 
     # Connect to MongoDB collection
     collection = connect_to_db_collection(client)
@@ -82,6 +83,17 @@ with st.container(border = True):
         st.session_state.steps[i] = st.text_input(label = f'Step {i+1}', value = st.session_state.steps[i], key = f'step_{i}')
 
     st.button(label = 'Add step', type = 'primary', on_click = add_step)
-    if st.button(label = 'Register recipe', type = 'primary', on_click = load_data_db, args = (name, cuisine, category, occasion, ingredients, st.session_state.steps)):
-        st.markdown('Recipe added!')
+    if st.button(label = 'Register recipe', type = 'primary'):
+        if not name.strip():
+            st.error('⚠️ Recipe name is required!')
+        if not ingredients.strip():
+            st.error('⚠️ Ingredients are required!')
+        else:
+            success = load_data_db(name, cuisine, category, occasion, ingredients, st.session_state.steps)
+            if success:
+                st.markdown('Recipe added!')
+            else:
+                st.error('⚠️ Failed to add recipe.')
+             
+             
 
