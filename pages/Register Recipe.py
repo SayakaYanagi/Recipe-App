@@ -82,7 +82,7 @@ with st.container(border = True):
     for i in range(1, len(st.session_state.steps)):
         st.session_state.steps[i] = st.text_input(label = f'Step {i+1}', value = st.session_state.steps[i], key = f'step_{i}')
 
-    st.button(label = 'Add step', type = 'primary', on_click = add_step)
+    st.button(label = ':material/add:', on_click = add_step)
     if st.button(label = 'Register recipe', type = 'primary'):
         if not name.strip():
             st.error('⚠️ Recipe name is required!')
