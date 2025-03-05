@@ -1,64 +1,23 @@
 import streamlit as st
 import pymongo
 from bson.objectid import ObjectId
+import utils
 
 # Font
-font = 'Funnel Display'
-
-def set_page_config():
-
-    """Set page config."""
-
-    st.set_page_config(
-            page_title='Home',
-            page_icon='📖',
-            layout='wide',
-            menu_items={'Get Help': None, 'Report a bug': None,'About': None},
-        )
-
-set_page_config()
-
-@st.cache_resource
-def init_connection():
-
-    """Initialise the MongoDB database connection"""
-    
-    mongo_uri = st.secrets['mongo']['uri']
-
-    # try:
-    #     client = pymongo.MongoClient(mongo_uri)
-    #     return client
-    # except Exception as e:
-    #     return f"Failed to connect to DB. {type(e)} : {e}"
-    client = pymongo.MongoClient(mongo_uri)
-    return client
-
-client = init_connection()
-
-# client = pymongo.MongoClient(f"mongodb://saya:mongo2024@localhost:32788/")
-# db = client.note_app
-# collection = db["notes"]
-
-def connect_to_db_collection(client):
-
-    database_name = st.secrets['mongo']['database']
-    collection_name = st.secrets['mongo']['collection']
-
-    db = client[database_name]
-    collection = db[collection_name]
-
-    return collection
+# font = 'Funnel Display'
 
 
-def fetch_data(name, cuisine, category, occasion):
 
-    
-    collection = connect_to_db_collection(client)
+
+def fetch_data(client, name, cuisine, category, occasion):
+
+    # Fetch all data
+    collection = utils.connect_to_db_collection(client)
 
     # Fitering query
     query = {}
     if name:
-        query['name'] = {'$regex': name, '$options' : 'i' }
+        query['name'] = {'$regex': name, '$options' : 'i' } # Case insensitive
     if cuisine:
         query['cuisine'] = cuisine
     if category:
@@ -76,8 +35,9 @@ def move_page(recipe_id):
     st.session_state.selected_recipe = recipe_id
 
 def create_filtering_input():
+
     """Create filtering input fields."""
-    # Adjusted column ratios for better alignment
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -97,73 +57,88 @@ def create_filtering_input():
 
     return name, cuisine, category, occasion
 
-if "selected_recipe" not in st.session_state:
-    st.session_state.selected_recipe = None
 
-if st.session_state.selected_recipe is None:
-    st.title('👨‍🍳 Home Cookbook 👩‍🍳')
+def main():
 
-    with st.form('recipe_finder_form'):
-        name,cuisine, category, occasion = create_filtering_input()
-        submitted = st.form_submit_button('Find Recipes')
+    # Set the page config
+    utils.set_page_config('Home')
 
-    if submitted:
-        with st.spinner('🧐 Searching for recipes...'):
+    # Coneect to MongoDB
+    client = utils.init_connection()
 
+    if "selected_recipe" not in st.session_state:
+        st.session_state.selected_recipe = None
 
-            recipes = fetch_data(name, cuisine, category, occasion)
+    if st.session_state.selected_recipe is None:
 
-            if recipes:
-                for recipe in recipes:
-                    with st.expander(icon = '🍽️', label = f"**{recipe.get('name')}**"):
-                        st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
-                        st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
-                        st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
-                        
-                        # if st.button(label = 'Go to recipe', 
-                        #              type = 'primary', 
-                        #              key=f"go_to_recipe_{recipe['_id']}"):
-                        #             move_page(str(recipe['_id']))
-                        if st.button(label = 'Go to recipe', 
-                                    type = 'primary', 
-                                    on_click = move_page, 
-                                    args=(str(recipe['_id']),)):
-                                    pass
+        # Page title
+        st.title('👨‍🍳 Home Cookbook 👩‍🍳')
 
-            else:
-                st.write('No recipes found. Try different filters.')
-else:
-    collection = connect_to_db_collection(client)
-    
-    # Fetch the recipe using its ObjectId
-    recipe = collection.find_one({'_id': ObjectId(st.session_state.selected_recipe)})
+        # Filter search
+        with st.form('recipe_finder_form'):
+            name, cuisine, category, occasion = create_filtering_input()
+            submitted = st.form_submit_button('Find Recipes')
 
-    if recipe:
-        st.title(f'🍽️ {recipe['name']}')
+        if submitted:
+            with st.spinner('🧐 Searching for recipes...'):
 
-        # Display attributes
-        with st.container(border = True):
-            st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
-            st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
-            st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
+                # Collect recipe data with filtering
+                recipes = fetch_data(client, name, cuisine, category, occasion)
 
-        # Display ingredients (Render HTML expressions)
-        st.subheader('Ingredients')
-        with st.container(border=True):
-            st.markdown(recipe.get('ingredients', 'N/A').replace("\n", "<br>"), unsafe_allow_html=True)
-
-        # Display steps (Render HTML expressions)
-        st.subheader('Steps')
-        for i, step in enumerate(recipe.get('step', []), start = 1):
-            with st.container(border = True):
-                st.markdown(f'**Step {i} :** {step}'.replace("\n", "<br>"), unsafe_allow_html=True)
-
-        if st.button(label = 'Back to Search',
-                     type = 'primary'):
-            st.session_state.selected_recipe = None
-            
+                if recipes:
+                    # Shows the search result
+                    for recipe in recipes:
+                        with st.expander(icon = '🍽️', label = f"**{recipe.get('name')}**"):
+                            st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
+                            st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
+                            st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
+                            
+                            # If button pressed, move to recipe detail page
+                            if st.button(label = 'Go to recipe', 
+                                        type = 'primary', 
+                                        on_click = move_page, 
+                                        args=(str(recipe['_id']),),
+                                        key=f"go_to_recipe_{recipe['_id']}"):
+                                        pass
+                            
+                else:
+                    st.info('No recipes found. Try different filters.')
     else:
-        st.error('Recipe not found!')
-        if st.button(label = 'Back to Search',
-                     type = 'primary'):
-            st.session_state.selected_recipe = None
+        collection = utils.connect_to_db_collection(client)
+        
+        # Fetch the recipe using its ObjectId
+        recipe = collection.find_one({'_id': ObjectId(st.session_state.selected_recipe)})
+
+        if recipe:
+            st.title(f'🍽️ {recipe['name']}')
+
+            # Display attributes
+            with st.container(border = True):
+                st.markdown(f"**Cuisine :** {recipe.get('cuisine', 'N/A')}")
+                st.markdown(f"**Category :** {recipe.get('category', 'N/A')}")
+                st.markdown(f"**Occasion :** {recipe.get('occasion', 'N/A')}")
+
+            # Display ingredients (Render HTML expressions)
+            st.subheader('Ingredients')
+            with st.container(border=True):
+                st.markdown(recipe.get('ingredients', 'N/A').replace("\n", "<br>"), unsafe_allow_html=True)
+
+            # Display steps (Render HTML expressions)
+            st.subheader('Steps')
+            for i, step in enumerate(recipe.get('step', []), start = 1):
+                with st.container(border = True):
+                    st.markdown(f'**Step {i} :** {step}'.replace("\n", "<br>"), unsafe_allow_html=True)
+
+            if st.button(label = 'Back to Search', type = 'primary'):
+                st.session_state.selected_recipe = None
+                
+        else:
+            # If recipe is not found, go back to search 
+            st.error('Recipe not found!')
+            if st.button(label = 'Back to Search',
+                        type = 'primary'):
+                st.session_state.selected_recipe = None
+
+
+if __name__ == '__main__':
+    main()
