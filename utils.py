@@ -1,7 +1,8 @@
 import streamlit as st
 import pymongo
 from bson.objectid import ObjectId
-
+import os
+import mongomock
 
 def set_page_config(page_title):
 
@@ -18,9 +19,12 @@ def set_page_config(page_title):
 def init_connection():
 
     """Initialise the MongoDB database connection"""
-    
-    mongo_uri = st.secrets['mongo']['uri']
-    client = pymongo.MongoClient(mongo_uri)
+
+    if os.getenv('MOCK_DB') == '1':
+        client = mongomock.Connection()
+    else:
+        mongo_uri = st.secrets['mongo']['uri']
+        client = pymongo.MongoClient(mongo_uri)
     return client
 
 client = init_connection()
