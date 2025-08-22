@@ -3,11 +3,8 @@ import pymongo
 from bson.objectid import ObjectId
 import utils
 
-# Font
-# font = 'Funnel Display'
-
-
-
+# Set the page config
+utils.set_page_config('Home')
 
 def fetch_data(client, name, cuisine, category, occasion):
 
@@ -52,7 +49,7 @@ def create_filtering_input():
                               index = None)
     with col4:
         occasion = st.selectbox(label = '🎂 Search by occasion', 
-                                options = ['Quick & Easy','Spicy', 'Healthy', 'Party', 'Vegetarian'],
+                                options = ['Quick & Easy','Spicy', 'Healthy', 'Party', 'Vegetarian', 'Keto'],
                                 index = None)
 
     return name, cuisine, category, occasion
@@ -60,8 +57,6 @@ def create_filtering_input():
 
 def main():
 
-    # Set the page config
-    utils.set_page_config('Home')
 
     # Coneect to MongoDB
     client = utils.init_connection()

@@ -3,8 +3,8 @@ import pymongo
 from datetime import date
 import utils
 
-
-
+# Set the page config
+# utils.set_page_config('Register Recipe')
 
 def add_step():
     st.session_state.steps.append('')
@@ -36,8 +36,6 @@ def load_data_db(client, name, cuisine, category, occasion, ingredients, steps):
 
 def main():
 
-    # Set the page config
-    utils.set_page_config('Register Recipe')
     # Page title
     st.title('✏️ Register your recipe!')
 
@@ -57,7 +55,7 @@ def main():
                                 options = ('Bread', 'Rice', 'Pasta', 'Curry', 'Salad', 'Soup', 'Meat', 'Fish', 'Dessert', 'Others (source etc.)'),
                                 index = None)
                         occasion = st.selectbox(label = 'Input occasion', 
-                                    options = ['Quick & Easy','Spicy', 'Healthy','Party', 'Vegetarian'],
+                                    options = ['Quick & Easy','Spicy', 'Healthy','Party', 'Vegetarian', 'Keto'],
                                     index = None)
                         
     # Ingredients section
@@ -107,9 +105,7 @@ def main():
                 success = load_data_db(client, name, cuisine, category, occasion, ingredients, st.session_state.steps)
                 if success:
                     st.success('Recipe added!')
-                    # st.balloons()
-                    st.snow()
-                    
+                    st.balloons()    
                     
                 else:
                     st.error('⚠️ Failed to add recipe.')
@@ -117,6 +113,7 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()
              
 
