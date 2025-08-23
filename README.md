@@ -18,20 +18,14 @@ Requirements:
    git clone https://github.com/SayakaYanagi/Recipe-App.git
    cd Recipe-App
    ```
-2. Create a secrets.toml in
+2. Create a secrets.toml in /Recipe-App/.streamlit/
+   Replace uri with your MongoDB credentials
 ```
 [mongo]
-host = "yourhostname"
-port = yourport
-username = "yourusername"
-password = "yourpassword"
+database = "cookbook"
+collection = "recipes"
+uri = "mongodb://{user}:{password}@{host}:{port}/"
 
-[theme]
-primaryColor="D24556"
-backgroundColor="#F6E7E5"
-secondaryBackgroundColor="#A8C7B3"
-textColor="#875767"
-font="sans serif"
 ```
 
 ### Usage
