@@ -6,6 +6,32 @@ You can add, edit, and delete recipes.
 <img width="480" height="260" alt="Screenshot 2025-08-22 at 08 38 58" src="https://github.com/user-attachments/assets/842694a8-d678-424e-960d-cbd55284f070" />
 
 ## Tech Stacks
-<img src="https://img.shields.io/badge/-Python-yellow.svg?logo=python&style=for-the-badge&logoColor=#3776AB">
+<img src="https://img.shields.io/badge/-Python-yellow.svg?logo=python&style=for-the-badge&logoColor=#3776AB"> <img src="https://img.shields.io/badge/-Mongodb-47A248.svg?logo=mongodb&style=for-the-badge">
 
+Requirements:
+- Ubuntu 24.04
+- Python 3.9+
 
+## Installation
+1. Clone the repository
+   ```
+   git clone https://github.com/SayakaYanagi/Recipe-App.git
+   cd Recipe-App
+   ```
+2. Create a secrets.toml in
+```
+[mongo]
+host = "yourhostname"
+port = yourport
+username = "yourusername"
+password = "yourpassword"
+
+[theme]
+primaryColor="D24556"
+backgroundColor="#F6E7E5"
+secondaryBackgroundColor="#A8C7B3"
+textColor="#875767"
+font="sans serif"
+```
+
+### Usage
