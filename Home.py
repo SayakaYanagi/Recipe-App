@@ -65,8 +65,7 @@ def delete_recipe(client, recipe_id):
         time.sleep(2)
         st.session_state.selected_recipe = None
         st.rerun()
-        
-        
+
     except Exception as e:
         st.error(f"Error deleting recipe: {e}")
 
@@ -151,7 +150,7 @@ def main():
                 with st.container(border = True):
                     st.markdown(f'**Step {i} :** {step}'.replace("\n", "<br>"), unsafe_allow_html=True)
 
-            col1, spacer, col2 = st.columns([1, 6, 1])
+            col1, spacer, col2 = st.columns([1.3, 6, 1.5])
             with col1:
                 if st.button(label = 'Back to Search', type = 'primary'):
                     st.session_state.selected_recipe = None
