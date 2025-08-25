@@ -4,7 +4,7 @@ from datetime import date
 import utils
 
 # Set the page config
-# utils.set_page_config('Register Recipe')
+utils.set_page_config('Resgister Recipe')
 
 def add_step():
     st.session_state.steps.append('')
