@@ -88,7 +88,7 @@ def main():
                                                         height = 70)
             with col2: #Delete button
                 if i == len(st.session_state.steps) - 1:
-                    if st.button(label = 'Delete', key=f'delete_step_{i}', use_container_width=True):
+                    if st.button(label = 'Delete', key=f'delete_step_{i}', width = 'stretch'):
                         st.session_state.steps.pop()  # Remove the last step
                         st.rerun() 
 
