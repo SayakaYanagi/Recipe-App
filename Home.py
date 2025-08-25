@@ -2,6 +2,7 @@ import streamlit as st
 import pymongo
 from bson.objectid import ObjectId
 import utils
+import time
 
 # Set the page config
 utils.set_page_config('Home')
@@ -54,11 +55,37 @@ def create_filtering_input():
 
     return name, cuisine, category, occasion
 
+def delete_recipe(client, recipe_id):
+    """Delete specified recipe from MongoDB."""
+
+    collection = utils.connect_to_db_collection(client)
+    try:
+        collection.delete_one({"_id": ObjectId(recipe_id)})
+        st.success('Removed the recipe successfully. Back to Home page...')
+        time.sleep(2)
+        st.session_state.selected_recipe = None
+        st.rerun()
+        
+        
+    except Exception as e:
+        st.error(f"Error deleting recipe: {e}")
+
+
+@st.dialog("⚠️ Are you sure?")
+def deletion_pop_up(client, recipe_id):
+
+    """Pop-up window to confirm if user wants to delete the recipe."""
+
+    st.write('Do you really want to delete this recipe? This process cannot be undone.')
+    if st.button(label = 'Delete', type = 'primary', width = 'stretch'):
+        delete_recipe(client, recipe_id)
+
+
+
 
 def main():
 
-
-    # Coneect to MongoDB
+    # Connect to MongoDB
     client = utils.init_connection()
 
     if "selected_recipe" not in st.session_state:
@@ -124,9 +151,16 @@ def main():
                 with st.container(border = True):
                     st.markdown(f'**Step {i} :** {step}'.replace("\n", "<br>"), unsafe_allow_html=True)
 
-            if st.button(label = 'Back to Search', type = 'primary'):
-                st.session_state.selected_recipe = None
-                
+            col1, spacer, col2 = st.columns([1, 6, 1])
+            with col1:
+                if st.button(label = 'Back to Search', type = 'primary'):
+                    st.session_state.selected_recipe = None
+            with col2:
+                if st.button(label = 'Delete this recipe', 
+                             type = 'secondary', 
+                             key = 'deletion_pop_up'):
+                    deletion_pop_up(client, str(recipe['_id']))
+
         else:
             # If recipe is not found, go back to search 
             st.error('Recipe not found!')
