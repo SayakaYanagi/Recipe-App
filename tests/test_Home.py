@@ -6,10 +6,6 @@ from streamlit.testing.v1 import AppTest
 import mongomock
 
 
-@pytest.fixture(autouse=True)
-def use_mock_db(monkeypatch):
-    monkeypatch.setenv('MOCK_DB', '1')
-
 @pytest.fixture
 def mock_client():
     client = mongomock.MongoClient()
@@ -35,7 +31,7 @@ def test_move_page():
     assert st.session_state.selected_recipe == 'abc123'
 
 def test_display_UI():
-    at = AppTest.from_file('app.py')
+    at = AppTest.from_file('Home.py')
     at.run()
 
     assert at.form("recipe_finder_form").button("Find Recipes").exists()
