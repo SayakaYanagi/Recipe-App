@@ -10,7 +10,7 @@ def set_page_config(page_title):
 
     st.set_page_config(
             page_title = page_title,
-            page_icon = '📖',
+            page_icon = '🧁',
             layout = 'wide',
             menu_items = {'Get Help': None, 'Report a bug': None,'About': None},
         )
