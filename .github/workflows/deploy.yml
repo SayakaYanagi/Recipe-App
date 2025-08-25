@@ -24,6 +24,6 @@ jobs:
 
       - name: Run Home.py test
         run: |
-          pytest tests/test_Home.py
+          PYTHONPATH=. pytest tests/test_Home.py
 
 
