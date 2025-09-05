@@ -27,7 +27,6 @@ def init_connection():
         client = pymongo.MongoClient(mongo_uri)
     return client
 
-client = init_connection()
 
 
 def connect_to_db_collection(client):
