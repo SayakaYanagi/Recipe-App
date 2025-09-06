@@ -23,6 +23,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Home.py test
+        env:
+          TESTING: 1
         run: |
           PYTHONPATH=. pytest tests/test_Home.py
 
