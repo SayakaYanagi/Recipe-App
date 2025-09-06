@@ -20,7 +20,7 @@ def init_connection():
 
     """Initialise the MongoDB database connection"""
 
-    if os.getenv('MOCK_DB') == '1':
+    if os.getenv('TESTING') == '1':
         client = mongomock.Connection()
     else:
         mongo_uri = st.secrets['mongo']['uri']
@@ -33,8 +33,12 @@ def connect_to_db_collection(client):
 
     """Connect to Mongo DB collection"""
 
-    database_name = st.secrets['mongo']['database']
-    collection_name = st.secrets['mongo']['collection']
+    if os.getenv('TESTING') == '1':
+        database_name = 'test_db'
+        collection_name = 'test_collection'
+    else:
+        database_name = st.secrets['mongo']['database']
+        collection_name = st.secrets['mongo']['collection']
 
     db = client[database_name]
     collection = db[collection_name]

@@ -1,10 +1,15 @@
 import os
 import pytest
-from Home import fetch_data, move_page
+from recipe_book.Home import fetch_data, move_page
 import streamlit as st
 from streamlit.testing.v1 import AppTest
 from unittest.mock import patch
 import mongomock
+
+@pytest.fixture
+def mock_client():
+    client = mongomock.MongoClient()
+    return client
 
 @pytest.fixture(autouse=True)
 def mock_streamlit_secrets(monkeypatch):
@@ -20,27 +25,32 @@ def mock_streamlit_secrets(monkeypatch):
 @pytest.fixture
 def mock_client():
     client = mongomock.MongoClient()
-    db = client['recipe_app']
-    collection = db['recipes']
+    db = client['test_db']
+    collection = db['test_collection']
     return client, collection
 
 @patch('streamlit.secrets', new={'mongo': {'uri': 'mongodb://localhost:27017'}})
 def test_fetch_data(mock_client):
 
-    from Home import fetch_data
+    # from Home import fetch_data
 
     client, collection = mock_client
 
     collection.insert_one({'name': 'Sushi', 'cuisine': 'Asian', 'category': 'Fish', 'occasion': 'Healthy'})
     
-    res = fetch_data(client, name = 'Sushi', cuisine = None, category = 'Fish', occasion = None)
+    res = fetch_data(client, 
+                     name = 'Sushi', 
+                     cuisine = None, 
+                     category = 'Fish', 
+                     occasion = None
+                    )
 
     assert len(res) == 1
     assert res[0]['name'] == 'Sushi'
 
 def test_move_page():
     
-    from Home import move_page
+    # from Home import move_page
     st.session_state.selected_recipe = None
     move_page('abc123')
 
