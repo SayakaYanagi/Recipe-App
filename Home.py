@@ -5,7 +5,7 @@ from kafka import KafkaProducer
 import logging
 import json
 # import utils
-from recipe_book import utils
+from . import utils
 import time
 import os
 from unittest.mock import MagicMock
