@@ -21,7 +21,7 @@ def init_connection():
     """Initialise the MongoDB database connection"""
 
     if os.getenv('TESTING') == '1':
-        client = mongomock.Connection()
+        client = mongomock.MongoClient()
     else:
         mongo_uri = st.secrets['mongo']['uri']
         client = pymongo.MongoClient(mongo_uri)
