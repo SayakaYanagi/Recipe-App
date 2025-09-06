@@ -3,6 +3,7 @@ import pytest
 from Home import fetch_data, move_page
 import streamlit as st
 from streamlit.testing.v1 import AppTest
+from unittest.mock import patch
 import mongomock
 
 @pytest.fixture(autouse=True)
