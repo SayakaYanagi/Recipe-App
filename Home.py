@@ -4,8 +4,7 @@ from bson.objectid import ObjectId
 from kafka import KafkaProducer
 import logging
 import json
-# import utils
-from . import utils
+import utils
 import time
 import os
 from unittest.mock import MagicMock
@@ -20,8 +19,9 @@ else:
     kafka_host = st.secrets['kafka']['host']
     producer = KafkaProducer(
         bootstrap_servers = f'{kafka_host}:9092',
-        value_serializer = lambda v: json.dumps(v).encode("utf-8")
+        value_serializer = lambda v: json.dumps(v).encode('utf-8')
     )
+
 
 class KafkaLoggingHandler(logging.Handler):
     def emit(self, record):
@@ -32,10 +32,10 @@ logger = logging.getLogger('streamlit-logger')
 logger.setLevel(logging.INFO)
 logger.addHandler(KafkaLoggingHandler())
 
-def fetch_data(client, name, cuisine, category, occasion, db_name = None, collection_name = None):
+def fetch_data(client, name, cuisine, category, occasion):
 
     # Fetch all data
-    collection = utils.connect_to_db_collection(client, db_name, collection_name)
+    collection = utils.connect_to_db_collection(client)
 
     # Fitering query
     query = {}
@@ -80,10 +80,10 @@ def create_filtering_input():
 
     return name, cuisine, category, occasion
 
-def delete_recipe(client, recipe_id, db_name = None, collection_name = None):
+def delete_recipe(client, recipe_id):
     """Delete specified recipe from MongoDB."""
 
-    collection = utils.connect_to_db_collection(client, db_name, collection_name)
+    collection = utils.connect_to_db_collection(client)
     try:
         collection.delete_one({"_id": ObjectId(recipe_id)})
         st.success('Removed the recipe successfully. Back to Home page...')
@@ -98,13 +98,13 @@ def delete_recipe(client, recipe_id, db_name = None, collection_name = None):
 
 
 @st.dialog("⚠️ Are you sure?")
-def deletion_pop_up(client, recipe_id, db_name = None, collection_name = None):
+def deletion_pop_up(client, recipe_id):
 
     """Pop-up window to confirm if user wants to delete the recipe."""
 
     st.write('Do you really want to delete this recipe? This process cannot be undone.')
     if st.button(label = 'Delete', type = 'primary', width = 'stretch'):
-        delete_recipe(client, recipe_id, db_name, collection_name)
+        delete_recipe(client, recipe_id)
 
 
 
@@ -133,7 +133,7 @@ def main():
                 # Collect recipe data with filtering
                 db_name = st.secrets['mongo']['database']
                 collection_name = st.secrets['mongo']['collection']
-                recipes = fetch_data(client, name, cuisine, category, occasion, db_name, collection_name)
+                recipes = fetch_data(client, name, cuisine, category, occasion)
 
                 if recipes:
                     # Shows the search result
@@ -155,7 +155,7 @@ def main():
                 else:
                     st.info('No recipes found. Try different filters.')
     else:
-        collection = utils.connect_to_db_collection(client, db_name, collection_name)
+        collection = utils.connect_to_db_collection(client)
         
         # Fetch the recipe using its ObjectId
         recipe = collection.find_one({'_id': ObjectId(st.session_state.selected_recipe)})
@@ -190,9 +190,8 @@ def main():
                              type = 'secondary', 
                              key = 'deletion_pop_up'):
                     deletion_pop_up(client, 
-                                    str(recipe['_id']), 
-                                    db_name, 
-                                    collection_name)
+                                    str(recipe['_id'])
+                                    )
 
         else:
             # If recipe is not found, go back to search 
