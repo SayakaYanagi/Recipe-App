@@ -26,6 +26,6 @@ jobs:
         env:
           TESTING: 1
         run: |
-          PYTHONPATH=$PWD/recipe_book pytest tests/
+          PYTHONPATH=$PWD pytest recipe_book/tests/
 
 
