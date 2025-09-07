@@ -1,6 +1,6 @@
 import os
 import pytest
-from recipe_book.Home import fetch_data, move_page
+from Home import fetch_data, move_page
 import streamlit as st
 from streamlit.testing.v1 import AppTest
 from unittest.mock import patch
