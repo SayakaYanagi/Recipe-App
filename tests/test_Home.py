@@ -59,6 +59,11 @@ def test_move_page():
 def test_display_UI():
     at = AppTest.from_file('Home.py')
     at.run()
+    
+    button_key = "FormSubmitter:recipe_finder_form-Find Recipes"
 
-    assert at.form("recipe_finder_form").button("Find Recipes").exists()
+    # Verify button is present
+    assert at.button(button_key) is not None
+    assert at.button(button_key).label == "Find Recipes"
+
 
