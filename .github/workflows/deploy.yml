@@ -26,6 +26,6 @@ jobs:
         env:
           TESTING: 1
         run: |
-          PYTHONPATH=. pytest tests/test_Home.py
+          PYTHONPATH=. pytest tests/
 
 
